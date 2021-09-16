@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Dummy controller class to verify installation success. Do not use for
  * your project work.
  */
+//for test commit
 @RestController
 public class CritterController {
 
