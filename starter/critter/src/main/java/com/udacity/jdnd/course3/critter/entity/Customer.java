@@ -8,17 +8,17 @@ public class Customer extends User {
     @Column(name = "phone_number")
     private String phoneNumber;
     private String notes;
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets;
 
     public Customer() {
     }
 
-    public Customer(String phoneNumber, String notes, List<Pet> pets) {
-        this.phoneNumber = phoneNumber;
-        this.notes = notes;
-        this.pets = pets;
-    }
+//    public Customer(String phoneNumber, String notes, List<Pet> pets) {
+//        this.phoneNumber = phoneNumber;
+//        this.notes = notes;
+//        this.pets = pets;
+//    }
 
     public String getPhoneNumber() {
         return phoneNumber;
@@ -36,11 +36,11 @@ public class Customer extends User {
         this.notes = notes;
     }
 
-    public List<Long> getPetIds() {
-        return petIds;
+    public List<Pet> getPets() {
+        return pets;
     }
 
-    public void setPetIds(List<Long> petIds) {
-        this.petIds = petIds;
+    public void setPets(List<Pet> pets) {
+        this.pets = pets;
     }
 }

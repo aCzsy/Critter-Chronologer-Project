@@ -11,6 +11,7 @@ public class Pet {
     @Id
     @GeneratedValue
     Long id;
+    @Enumerated(EnumType.STRING)
     private PetType petType;
     @Nationalized
     private String name;
