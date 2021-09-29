@@ -1,10 +1,22 @@
 package com.udacity.jdnd.course3.critter.user;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.udacity.jdnd.course3.critter.entity.Customer;
+import com.udacity.jdnd.course3.critter.entity.Employee;
+import com.udacity.jdnd.course3.critter.entity.Pet;
+import com.udacity.jdnd.course3.critter.entity.User;
+import com.udacity.jdnd.course3.critter.service.PetService;
+import com.udacity.jdnd.course3.critter.service.UserService;
+import com.udacity.jdnd.course3.critter.view.Views;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Handles web requests related to Users.
@@ -16,29 +28,56 @@ import java.util.Set;
 @RequestMapping("/user")
 public class UserController {
 
+    @Autowired
+    UserService userService;
+
+    @Autowired
+    PetService petService;
+
     @PostMapping("/customer")
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
-        throw new UnsupportedOperationException();
+        //Saving customer
+        Customer savedCustomer = (Customer) userService.saveUser(convertCustomerDTOtoCustomer(customerDTO));
+        return convertCustomerToCustomerDTO((Customer) userService.findUserById(savedCustomer.getId()));
     }
 
     @GetMapping("/customer")
     public List<CustomerDTO> getAllCustomers(){
-        throw new UnsupportedOperationException();
+        List<CustomerDTO> allCustomers =
+                userService.findAllCustomers()
+                        .stream()
+                        .map(user -> convertCustomerToCustomerDTO((Customer)user))
+                        .collect(Collectors.toList());
+        return allCustomers;
     }
 
     @GetMapping("/customer/pet/{petId}")
     public CustomerDTO getOwnerByPet(@PathVariable long petId){
-        throw new UnsupportedOperationException();
+        Pet pet = petService.findPetById(petId);
+        Customer customer = (Customer) userService.findUserById(pet.getCustomer().getId());
+        return convertCustomerToCustomerDTO(customer);
     }
 
     @PostMapping("/employee")
     public EmployeeDTO saveEmployee(@RequestBody EmployeeDTO employeeDTO) {
-        throw new UnsupportedOperationException();
+        User savedEmployee = userService.saveUser(convertEmployeeDTOtoEmployee(employeeDTO));
+        return convertEmployeeToEmployeeDTO((Employee) userService.findUserById(savedEmployee.getId()));
+    }
+
+    @GetMapping("/employee")
+    public List<EmployeeDTO> getAllEmployees(){
+        List<EmployeeDTO> allEmployees =
+                userService.findAllEmployees()
+                .stream()
+                .map(employee -> convertEmployeeToEmployeeDTO(employee))
+                .collect(Collectors.toList());
+        return allEmployees;
     }
 
     @PostMapping("/employee/{employeeId}")
     public EmployeeDTO getEmployee(@PathVariable long employeeId) {
-        throw new UnsupportedOperationException();
+        Employee employee = (Employee) userService.findUserById(employeeId);
+        return convertEmployeeToEmployeeDTO(employee);
     }
 
     @PutMapping("/employee/{employeeId}")
@@ -46,9 +85,42 @@ public class UserController {
         throw new UnsupportedOperationException();
     }
 
+    @JsonView(Views.Public.class)
+    @GetMapping("/getAllUsers")
+    public List<User> getAllUsers(){
+        return userService.findAllUsers();
+    }
+
     @GetMapping("/employee/availability")
     public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
         throw new UnsupportedOperationException();
+    }
+
+    private static Customer convertCustomerDTOtoCustomer(CustomerDTO customerDTO){
+        Customer customer = new Customer();
+        BeanUtils.copyProperties(customerDTO,customer);
+        return customer;
+    }
+
+    private static CustomerDTO convertCustomerToCustomerDTO(Customer customer){
+        CustomerDTO customerDTO = new CustomerDTO();
+        BeanUtils.copyProperties(customer,customerDTO);
+        if(!customer.getPets().isEmpty()){
+            customer.getPets().forEach(pet -> customerDTO.getPetIds().add(pet.getId()));
+        }
+        return customerDTO;
+    }
+
+    private static Employee convertEmployeeDTOtoEmployee(EmployeeDTO employeeDTO){
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        return employee;
+    }
+
+    private static EmployeeDTO convertEmployeeToEmployeeDTO(Employee employee){
+        EmployeeDTO employeeDTO = new EmployeeDTO();
+        BeanUtils.copyProperties(employee,employeeDTO);
+        return employeeDTO;
     }
 
 }

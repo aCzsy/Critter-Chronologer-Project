@@ -9,10 +9,10 @@ import java.time.LocalDate;
 @Entity
 public class Pet {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     @Enumerated(EnumType.STRING)
-    private PetType petType;
+    private PetType type;
     @Nationalized
     private String name;
     @ManyToOne
@@ -32,12 +32,12 @@ public class Pet {
         this.id = id;
     }
 
-    public PetType getPetType() {
-        return petType;
+    public PetType getType() {
+        return type;
     }
 
-    public void setPetType(PetType petType) {
-        this.petType = petType;
+    public void setType(PetType petType) {
+        this.type = petType;
     }
 
     public String getName() {

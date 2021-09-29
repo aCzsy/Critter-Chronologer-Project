@@ -1,6 +1,8 @@
 package com.udacity.jdnd.course3.critter.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -8,8 +10,9 @@ public class Customer extends User {
     @Column(name = "phone_number")
     private String phoneNumber;
     private String notes;
+    //mappedBy = referenced by
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Pet> pets;
+    private List<Pet> pets = new ArrayList<>();
 
     public Customer() {
     }
@@ -19,6 +22,15 @@ public class Customer extends User {
 //        this.notes = notes;
 //        this.pets = pets;
 //    }
+    public void addPet(Pet pet){
+        pets.add(pet);
+        pet.setCustomer(this);
+    }
+
+    public void removePet(Pet pet){
+        pets.remove(pet);
+        pet.setCustomer(null);
+    }
 
     public String getPhoneNumber() {
         return phoneNumber;

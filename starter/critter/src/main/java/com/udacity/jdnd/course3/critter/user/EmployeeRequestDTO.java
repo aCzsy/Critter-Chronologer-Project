@@ -1,6 +1,7 @@
 package com.udacity.jdnd.course3.critter.user;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -8,7 +9,7 @@ import java.util.Set;
  * to the database directly.
  */
 public class EmployeeRequestDTO {
-    private Set<EmployeeSkill> skills;
+    private Set<EmployeeSkill> skills = new HashSet<>();
     private LocalDate date;
 
     public Set<EmployeeSkill> getSkills() {

@@ -4,16 +4,21 @@ import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 
 import javax.persistence.*;
 import java.time.DayOfWeek;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 public class Employee extends User {
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "employee_skills", joinColumns = @JoinColumn(name = "employee_id"))
-    private Set<EmployeeSkill> skills;
-    @ElementCollection
+    @Column(length = 15)
+    //@JoinTable(name = "employee_skills")
+    private Set<EmployeeSkill> skills = new HashSet<>();
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "employee_days_available", joinColumns = @JoinColumn(name = "employee_id"))
-    private Set<DayOfWeek> daysAvailable;
+    @Column(length = 15)
+    //@JoinTable(name = "employee_days_available")
+    private Set<DayOfWeek> daysAvailable = new HashSet<>();
 
     public Employee() {
     }

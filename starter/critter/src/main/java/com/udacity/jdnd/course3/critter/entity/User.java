@@ -1,16 +1,20 @@
 package com.udacity.jdnd.course3.critter.entity;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import com.udacity.jdnd.course3.critter.view.Views;
 import org.hibernate.annotations.Nationalized;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
-public class User {
+@DiscriminatorColumn(name = "user_type")
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+public abstract class User {
     @Id
     @GeneratedValue
+    @JsonView(Views.Public.class)
     Long id;
+    @JsonView(Views.Public.class)
     @Nationalized
     String name;
 
