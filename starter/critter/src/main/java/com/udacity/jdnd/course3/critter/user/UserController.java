@@ -82,7 +82,8 @@ public class UserController {
 
     @PutMapping("/employee/{employeeId}")
     public void setAvailability(@RequestBody Set<DayOfWeek> daysAvailable, @PathVariable long employeeId) {
-        throw new UnsupportedOperationException();
+        Employee employee = (Employee) userService.findUserById(employeeId);
+        employee.setDaysAvailable(daysAvailable);
     }
 
     @JsonView(Views.Public.class)
@@ -93,7 +94,14 @@ public class UserController {
 
     @GetMapping("/employee/availability")
     public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
-        throw new UnsupportedOperationException();
+        List<EmployeeDTO> employeeList =
+                userService.findAllEmployees()
+                .stream()
+                .filter(employee -> employee.getSkills().containsAll(employeeDTO.getSkills())
+                && employee.getDaysAvailable().contains(employeeDTO.getDate().getDayOfWeek()))
+                .map(UserController::convertEmployeeToEmployeeDTO)
+                .collect(Collectors.toList());
+        return employeeList;
     }
 
     private static Customer convertCustomerDTOtoCustomer(CustomerDTO customerDTO){
