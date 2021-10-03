@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,7 @@ public class UserController {
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
         //Saving customer
         Customer savedCustomer = (Customer) userService.saveUser(convertCustomerDTOtoCustomer(customerDTO));
-        return convertCustomerToCustomerDTO((Customer) userService.findUserById(savedCustomer.getId()));
+        return convertCustomerToCustomerDTO(savedCustomer);
     }
 
     @GetMapping("/customer")

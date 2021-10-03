@@ -15,5 +15,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Customer> findAllCustomers();
     @Query("select e from Employee e")
     List<Employee> findAllEmployees();
-
 }

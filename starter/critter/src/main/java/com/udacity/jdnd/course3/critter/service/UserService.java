@@ -27,7 +27,7 @@ public class UserService {
         if(foundUser.isPresent()){
             return foundUser.get();
         } else{
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User not found");
         }
     }
 
