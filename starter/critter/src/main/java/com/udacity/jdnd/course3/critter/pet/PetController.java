@@ -74,6 +74,11 @@ public class PetController {
         return allPetsByOwner;
     }
 
+    @DeleteMapping("/delete/{petId}")
+    public void deletePet(@PathVariable Long petId){
+        petService.deletePetById(petId);
+    }
+
     private static Pet convertPetDTOtoPetEntity(PetDTO petDTO){
         Pet pet = new Pet();
         BeanUtils.copyProperties(petDTO,pet);

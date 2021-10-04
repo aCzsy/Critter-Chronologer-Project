@@ -84,6 +84,11 @@ public class ScheduleController {
         return listToReturn;
     }
 
+    @DeleteMapping("/delete/{scheduleId}")
+    public void deleteSchedule(@PathVariable Long scheduleId){
+        scheduleService.deleteSchedule(scheduleId);
+    }
+
     private Schedule convertScheduleDTOtoSchedule(ScheduleDTO scheduleDTO){
         Schedule schedule = new Schedule();
         BeanUtils.copyProperties(scheduleDTO,schedule);

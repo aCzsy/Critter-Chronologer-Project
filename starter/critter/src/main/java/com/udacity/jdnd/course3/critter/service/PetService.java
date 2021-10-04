@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -30,5 +31,15 @@ public class PetService {
 
     public List<Pet> findPetsByOwner(Long id){
         return petRepository.findPetsByCustomerId(id);
+    }
+
+    public void deletePetById(Long id){
+        Pet pet;
+        if(petRepository.findById(id).isPresent()){
+            pet = petRepository.findById(id).get();
+        }else {
+            throw new RuntimeException("Pet not found");
+        }
+        pet.getCustomer().removePet(pet);
     }
 }

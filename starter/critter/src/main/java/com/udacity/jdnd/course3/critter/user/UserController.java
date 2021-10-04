@@ -105,6 +105,16 @@ public class UserController {
         return employeeList;
     }
 
+    @DeleteMapping("/customer/delete/{customerId}")
+    public void deleteCustomer(@PathVariable Long customerId){
+        userService.deleteUser(customerId);
+    }
+
+    @DeleteMapping("/employee/delete/{employeeId}")
+    public void deleteEmployee(@PathVariable Long employeeId){
+        userService.deleteUser(employeeId);
+    }
+
     private static Customer convertCustomerDTOtoCustomer(CustomerDTO customerDTO){
         Customer customer = new Customer();
         BeanUtils.copyProperties(customerDTO,customer);

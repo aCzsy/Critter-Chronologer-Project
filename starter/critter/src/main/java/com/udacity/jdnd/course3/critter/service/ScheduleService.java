@@ -53,4 +53,8 @@ public class ScheduleService {
                 .collect(Collectors.toList());
     }
 
+    public void deleteSchedule(Long id){
+        scheduleRepository.deleteById(id);
+    }
+
 }
