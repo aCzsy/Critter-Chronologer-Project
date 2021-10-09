@@ -1,14 +1,16 @@
-package com.udacity.jdnd.course3.critter.schedule;
+package com.udacity.jdnd.course3.critter.controller;
 
 import com.udacity.jdnd.course3.critter.entity.Customer;
 import com.udacity.jdnd.course3.critter.entity.Employee;
 import com.udacity.jdnd.course3.critter.entity.Pet;
 import com.udacity.jdnd.course3.critter.entity.Schedule;
+import com.udacity.jdnd.course3.critter.schedule.ScheduleDTO;
 import com.udacity.jdnd.course3.critter.service.PetService;
 import com.udacity.jdnd.course3.critter.service.ScheduleService;
 import com.udacity.jdnd.course3.critter.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -85,8 +87,9 @@ public class ScheduleController {
     }
 
     @DeleteMapping("/delete/{scheduleId}")
-    public void deleteSchedule(@PathVariable Long scheduleId){
+    public ResponseEntity<?> deleteSchedule(@PathVariable Long scheduleId){
         scheduleService.deleteSchedule(scheduleId);
+        return ResponseEntity.noContent().build();
     }
 
     private Schedule convertScheduleDTOtoSchedule(ScheduleDTO scheduleDTO){

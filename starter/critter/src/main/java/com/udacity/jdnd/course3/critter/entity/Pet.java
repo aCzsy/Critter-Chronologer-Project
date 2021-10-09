@@ -4,6 +4,7 @@ import com.udacity.jdnd.course3.critter.pet.PetType;
 import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
 @Entity

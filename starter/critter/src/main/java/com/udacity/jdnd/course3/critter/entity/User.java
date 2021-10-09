@@ -5,6 +5,7 @@ import com.udacity.jdnd.course3.critter.view.Views;
 import org.hibernate.annotations.Nationalized;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @DiscriminatorColumn(name = "user_type")

@@ -1,5 +1,6 @@
 package com.udacity.jdnd.course3.critter.service;
 
+import com.udacity.jdnd.course3.critter.Exception.PetNotFoundException;
 import com.udacity.jdnd.course3.critter.entity.Pet;
 import com.udacity.jdnd.course3.critter.pet.PetDTO;
 import com.udacity.jdnd.course3.critter.repository.PetRepository;
@@ -38,8 +39,20 @@ public class PetService {
         if(petRepository.findById(id).isPresent()){
             pet = petRepository.findById(id).get();
         }else {
-            throw new RuntimeException("Pet not found");
+            throw new PetNotFoundException("Pet not found");
         }
         pet.getCustomer().removePet(pet);
+    }
+
+    public Pet update(Pet newPet){
+        return petRepository.findById(newPet.getId())
+                .map(pet -> {
+                    pet.setName(newPet.getName());
+                    pet.setBirthDate(newPet.getBirthDate());
+                    pet.setType(newPet.getType());
+                    Optional<String> notes = Optional.ofNullable(newPet.getNotes());
+                    if(notes.isPresent()) pet.setNotes(newPet.getNotes()); else pet.setNotes(pet.getNotes());
+                    return petRepository.save(pet);
+                }).orElseThrow(PetNotFoundException::new);
     }
 }

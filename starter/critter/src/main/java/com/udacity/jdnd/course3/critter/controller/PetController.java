@@ -1,11 +1,13 @@
-package com.udacity.jdnd.course3.critter.pet;
+package com.udacity.jdnd.course3.critter.controller;
 
 import com.udacity.jdnd.course3.critter.entity.Customer;
 import com.udacity.jdnd.course3.critter.entity.Pet;
+import com.udacity.jdnd.course3.critter.pet.PetDTO;
 import com.udacity.jdnd.course3.critter.service.PetService;
 import com.udacity.jdnd.course3.critter.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -75,8 +77,15 @@ public class PetController {
     }
 
     @DeleteMapping("/delete/{petId}")
-    public void deletePet(@PathVariable Long petId){
+    public ResponseEntity<?> deletePet(@PathVariable Long petId){
         petService.deletePetById(petId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/update/{petId}")
+    public PetDTO updatePet(@PathVariable Long petId, @RequestBody PetDTO petDTO){
+        petDTO.setId(petId);
+        return convertPetToPetDTO(petService.update(convertPetDTOtoPetEntity(petDTO)));
     }
 
     private static Pet convertPetDTOtoPetEntity(PetDTO petDTO){

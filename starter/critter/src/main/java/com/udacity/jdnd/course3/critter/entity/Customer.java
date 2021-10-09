@@ -1,6 +1,7 @@
 package com.udacity.jdnd.course3.critter.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +18,6 @@ public class Customer extends User {
     public Customer() {
     }
 
-//    public Customer(String phoneNumber, String notes, List<Pet> pets) {
-//        this.phoneNumber = phoneNumber;
-//        this.notes = notes;
-//        this.pets = pets;
-//    }
     public void addPet(Pet pet){
         pets.add(pet);
         pet.setCustomer(this);

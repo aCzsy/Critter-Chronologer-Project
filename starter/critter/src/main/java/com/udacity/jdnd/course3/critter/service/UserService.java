@@ -42,4 +42,29 @@ public class UserService {
     public void deleteUser(Long id){
         userRepository.deleteById(id);
     }
+
+    public Customer updateCustomer(Customer customer){
+        return userRepository.findCustomerById(customer.getId())
+                .map(cust -> {
+                    Optional<String> phoneNumber = Optional.ofNullable(customer.getPhoneNumber());
+                    if(phoneNumber.isPresent()) cust.setPhoneNumber(customer.getPhoneNumber()); else cust.setPhoneNumber(cust.getPhoneNumber());
+                    Optional<String> name = Optional.ofNullable(customer.getName());
+                    if(name.isPresent()) cust.setName(customer.getName()); else cust.setName(cust.getName());
+                    Optional<String> notes = Optional.ofNullable(customer.getNotes());
+                    if(notes.isPresent()) cust.setNotes(customer.getNotes()); else cust.setNotes(cust.getNotes());
+                    return cust;
+                }).orElseThrow(UserNotFoundException::new);
+    }
+
+    public Employee updateEmployee(Employee employee){
+        return userRepository.findEmployeeById(employee.getId())
+                .map(emp -> {
+                    Optional<String> name = Optional.ofNullable(employee.getName());
+                    if(name.isPresent()) emp.setName(employee.getName()); else emp.setName(emp.getName());
+                    emp.setSkills(employee.getSkills());
+                    emp.setDaysAvailable(employee.getDaysAvailable());
+                    return emp;
+                }).orElseThrow(UserNotFoundException::new);
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.udacity.jdnd.course3.critter.user;
+package com.udacity.jdnd.course3.critter.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.udacity.jdnd.course3.critter.entity.Customer;
@@ -7,15 +7,18 @@ import com.udacity.jdnd.course3.critter.entity.Pet;
 import com.udacity.jdnd.course3.critter.entity.User;
 import com.udacity.jdnd.course3.critter.service.PetService;
 import com.udacity.jdnd.course3.critter.service.UserService;
+import com.udacity.jdnd.course3.critter.user.CustomerDTO;
+import com.udacity.jdnd.course3.critter.user.EmployeeDTO;
+import com.udacity.jdnd.course3.critter.user.EmployeeRequestDTO;
 import com.udacity.jdnd.course3.critter.view.Views;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,6 +60,18 @@ public class UserController {
         Pet pet = petService.findPetById(petId);
         Customer customer = (Customer) userService.findUserById(pet.getCustomer().getId());
         return convertCustomerToCustomerDTO(customer);
+    }
+
+    @DeleteMapping("/customer/delete/{customerId}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable Long customerId){
+        userService.deleteUser(customerId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/customer/update/{customerId}")
+    public CustomerDTO updateCustomer(@PathVariable Long customerId, @RequestBody CustomerDTO customerDTO){
+        customerDTO.setId(customerId);
+        return convertCustomerToCustomerDTO(userService.updateCustomer(convertCustomerDTOtoCustomer(customerDTO)));
     }
 
     @PostMapping("/employee")
@@ -105,15 +120,19 @@ public class UserController {
         return employeeList;
     }
 
-    @DeleteMapping("/customer/delete/{customerId}")
-    public void deleteCustomer(@PathVariable Long customerId){
-        userService.deleteUser(customerId);
-    }
 
     @DeleteMapping("/employee/delete/{employeeId}")
-    public void deleteEmployee(@PathVariable Long employeeId){
+    public ResponseEntity<?> deleteEmployee(@PathVariable Long employeeId){
         userService.deleteUser(employeeId);
+        return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/employee/update/{employeeId}")
+    public EmployeeDTO updateEmployee(@PathVariable Long employeeId, @Valid @RequestBody EmployeeDTO employeeDTO){
+        employeeDTO.setId(employeeId);
+        return convertEmployeeToEmployeeDTO(userService.updateEmployee(convertEmployeeDTOtoEmployee(employeeDTO)));
+    }
+
 
     private static Customer convertCustomerDTOtoCustomer(CustomerDTO customerDTO){
         Customer customer = new Customer();
