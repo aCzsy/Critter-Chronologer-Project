@@ -46,7 +46,6 @@ public class ErrorController{
                 .map(error -> error.getField() + ": " + error.getDefaultMessage()).collect(
                         Collectors.toList());
 
-        ApiError apiError = new ApiError(DEFAULT_VALIDATION_FAILED_MESSAGE, errors);
         return errors;
     }
 }
