@@ -34,8 +34,6 @@ It returns a ResponseEntity in contrast to DefaultHandlerExceptionResolver which
 @ControllerAdvice
 public class ErrorController{
 
-    private static final String DEFAULT_VALIDATION_FAILED_MESSAGE = "Validation failed";
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody

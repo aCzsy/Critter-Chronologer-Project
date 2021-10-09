@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -90,6 +91,12 @@ public class ScheduleController {
     public ResponseEntity<?> deleteSchedule(@PathVariable Long scheduleId){
         scheduleService.deleteSchedule(scheduleId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/update/{scheduleId}")
+    public ScheduleDTO updateSchedule(@PathVariable Long scheduleId, @Valid @RequestBody ScheduleDTO scheduleDTO){
+        scheduleDTO.setId(scheduleId);
+        return convertScheduleToScheduleDTO(scheduleService.updateSchedule(convertScheduleDTOtoSchedule(scheduleDTO)));
     }
 
     private Schedule convertScheduleDTOtoSchedule(ScheduleDTO scheduleDTO){

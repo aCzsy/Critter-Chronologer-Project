@@ -1,5 +1,7 @@
 package com.udacity.jdnd.course3.critter.user;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.DayOfWeek;
 import java.util.HashSet;
 import java.util.Set;
@@ -11,7 +13,11 @@ import java.util.Set;
 public class EmployeeDTO {
     private long id;
     private String name;
+    @NotNull(message = "Skills list is required")
+    @NotEmpty(message = "Skills list can not be empty")
     private Set<EmployeeSkill> skills = new HashSet<>();
+    @NotNull(message = "List of days available is required")
+    @NotEmpty(message = "List of days available can not be empty")
     private Set<DayOfWeek> daysAvailable = new HashSet<>();
 
     public long getId() {

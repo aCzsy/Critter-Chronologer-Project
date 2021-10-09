@@ -11,15 +11,11 @@ import java.util.Set;
 
 @Entity
 public class Employee extends User {
-    @NotNull(message = "Skills list is required")
-    @NotEmpty(message = "Skills list can not be empty")
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "employee_skills", joinColumns = @JoinColumn(name = "employee_id"))
     @Column(length = 15)
     //@JoinTable(name = "employee_skills")
     private Set<EmployeeSkill> skills = new HashSet<>();
-    @NotNull(message = "List of days available is required")
-    @NotEmpty(message = "List of days available can not be empty")
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "employee_days_available", joinColumns = @JoinColumn(name = "employee_id"))
     @Column(length = 15)

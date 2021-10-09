@@ -1,5 +1,6 @@
 package com.udacity.jdnd.course3.critter.service;
 
+import com.udacity.jdnd.course3.critter.Exception.ScheduleNotFoundException;
 import com.udacity.jdnd.course3.critter.Exception.UserNotFoundException;
 import com.udacity.jdnd.course3.critter.entity.*;
 import com.udacity.jdnd.course3.critter.repository.ScheduleRepository;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,6 +57,18 @@ public class ScheduleService {
 
     public void deleteSchedule(Long id){
         scheduleRepository.deleteById(id);
+    }
+
+    public Schedule updateSchedule(Schedule schedule){
+        return scheduleRepository.findById(schedule.getId())
+                .map(sched -> {
+                    sched.setEmployeeList(schedule.getEmployeeList());
+                    sched.setActivities(schedule.getActivities());
+                    sched.setPetList(schedule.getPetList());
+                    Optional<LocalDate> localDate = Optional.ofNullable(schedule.getDate());
+                    if(localDate.isPresent()) sched.setDate(schedule.getDate()); else sched.setDate(sched.getDate());
+                    return sched;
+                }).orElseThrow(ScheduleNotFoundException::new);
     }
 
 }
