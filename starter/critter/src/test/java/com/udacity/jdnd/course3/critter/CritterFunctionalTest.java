@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.udacity.jdnd.course3.critter.controller.PetController;
 import com.udacity.jdnd.course3.critter.controller.UserController;
+import com.udacity.jdnd.course3.critter.entity.Pet;
 import com.udacity.jdnd.course3.critter.pet.PetDTO;
 import com.udacity.jdnd.course3.critter.pet.PetType;
 import com.udacity.jdnd.course3.critter.controller.ScheduleController;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -241,6 +243,115 @@ public class CritterFunctionalTest {
         compareSchedules(sched3, scheds2c.get(1));
     }
 
+    @Test
+    public void testDeletePet(){
+        PetDTO pet = createPetDTO();
+        CustomerDTO customerDTO = createCustomerDTO();
+        CustomerDTO createdCustomer = userController.saveCustomer(customerDTO);
+        pet.setOwnerId(createdCustomer.getId());
+        PetDTO savedPet = petController.savePet(pet);
+        Assertions.assertEquals(savedPet.getId(),petController.getPet(savedPet.getId()).getId());
+
+        petController.deletePet(savedPet.getId());
+        Assertions.assertThrows(NullPointerException.class, () -> petController.getPet(savedPet.getId()));
+    }
+
+    @Test
+    public void testDeleteCustomer(){
+        CustomerDTO customerDTO = createCustomerDTO();
+        CustomerDTO savedCustomer = userController.saveCustomer(customerDTO);
+        Assertions.assertEquals(savedCustomer.getId(), userController.getCustomer(savedCustomer.getId()).getId());
+
+        userController.deleteCustomer(savedCustomer.getId());
+        Assertions.assertEquals(0,userController.getAllCustomers().size());
+    }
+
+    @Test
+    public void testDeleteEmployee(){
+        EmployeeDTO employeeDTO = createEmployeeDTO();
+        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.MONDAY, DayOfWeek.FRIDAY));
+        EmployeeDTO savedEmployee = userController.saveEmployee(employeeDTO);
+        Assertions.assertEquals(savedEmployee.getId(), userController.getEmployee(savedEmployee.getId()).getId());
+
+        userController.deleteEmployee(savedEmployee.getId());
+        Assertions.assertEquals(0, userController.getAllEmployees().size());
+    }
+
+    @Test
+    public void testDeleteSchedule(){
+        ScheduleDTO sched1 = populateSchedule(1, 2, LocalDate.of(2019, 12, 25), Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.WALKING));
+        Assertions.assertEquals(sched1.getId(), scheduleController.getSchedule(sched1.getId()).getId());
+
+        scheduleController.deleteSchedule(sched1.getId());
+        Assertions.assertEquals(0, scheduleController.getAllSchedules().size());
+    }
+
+    @Test
+    public void testUpdatePet(){
+        PetDTO pet = createPetDTO();
+        CustomerDTO customerDTO = createCustomerDTO();
+        CustomerDTO createdCustomer = userController.saveCustomer(customerDTO);
+        pet.setOwnerId(createdCustomer.getId());
+        PetDTO savedPet = petController.savePet(pet);
+
+        Assertions.assertEquals(savedPet.getId(), petController.getPet(savedPet.getId()).getId());
+
+        PetDTO pet2 = createPetDTO();
+        pet2.setOwnerId(createdCustomer.getId());
+        pet2.setType(PetType.BIRD);
+
+        petController.updatePet(savedPet.getId(), pet2);
+        //Testing if the type has changed
+        Assertions.assertEquals(PetType.BIRD, petController.getPet(savedPet.getId()).getType());
+        //Testing if the name doesn't change if it is not specified in pet2
+        Assertions.assertEquals(savedPet.getName(),petController.getPet(savedPet.getId()).getName());
+    }
+
+    @Test
+    public void testUpdateCustomer(){
+        CustomerDTO customerDTO = createCustomerDTO();
+        CustomerDTO savedCustomer = userController.saveCustomer(customerDTO);
+        Assertions.assertEquals(savedCustomer.getId(), userController.getCustomer(savedCustomer.getId()).getId());
+
+        CustomerDTO customerDTO1 = createCustomerDTO();
+        customerDTO1.setPhoneNumber("123-456-789");
+
+        userController.updateCustomer(savedCustomer.getId(), customerDTO1);
+        //Testing if the name doesn't change if it is not specified in customerDT01
+        Assertions.assertEquals(savedCustomer.getName(), userController.getCustomer(savedCustomer.getId()).getName());
+        //Testing if phone number changed
+        Assertions.assertEquals("123-456-789", userController.getCustomer(savedCustomer.getId()).getPhoneNumber());
+    }
+
+    @Test
+    public void testUpdateEmployee(){
+        EmployeeDTO employeeDTO = createEmployeeDTO();
+        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.MONDAY, DayOfWeek.FRIDAY));
+        EmployeeDTO savedEmployee = userController.saveEmployee(employeeDTO);
+        Assertions.assertEquals(savedEmployee.getId(), userController.getEmployee(savedEmployee.getId()).getId());
+
+        EmployeeDTO employeeDTO1 = createEmployeeDTO();
+        employeeDTO1.setSkills(Sets.newHashSet(EmployeeSkill.MEDICATING, EmployeeSkill.SHAVING));
+        employeeDTO1.setDaysAvailable(Sets.newHashSet(DayOfWeek.TUESDAY, DayOfWeek.FRIDAY));
+
+        userController.updateEmployee(savedEmployee.getId(), employeeDTO1);
+        Assertions.assertEquals(employeeDTO1.getDaysAvailable(), userController.getEmployee(savedEmployee.getId()).getDaysAvailable());
+        Assertions.assertEquals(employeeDTO1.getSkills(), userController.getEmployee(savedEmployee.getId()).getSkills());
+    }
+
+    @Test
+    public void testUpdateSchedule(){
+        ScheduleDTO sched1 = populateSchedule(1, 2, LocalDate.of(2019, 12, 25), Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.WALKING));
+        Assertions.assertEquals(sched1.getId(), scheduleController.getSchedule(sched1.getId()).getId());
+
+        ScheduleDTO sched2 = createScheduleWithoutSaving(3, 1, LocalDate.of(2019, 12, 26), Sets.newHashSet(EmployeeSkill.PETTING));
+
+        scheduleController.updateSchedule(sched1.getId(), sched2);
+        Assertions.assertEquals(3,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
+        Assertions.assertEquals(1,scheduleController.getSchedule(sched1.getId()).getPetIds().size());
+        Assertions.assertEquals(Sets.newHashSet(EmployeeSkill.PETTING), scheduleController.getSchedule(sched1.getId()).getActivities());
+    }
+
 
     private static EmployeeDTO createEmployeeDTO() {
         EmployeeDTO employeeDTO = new EmployeeDTO();
@@ -294,6 +405,24 @@ public class CritterFunctionalTest {
                     return petController.savePet(p).getId();
                 }).collect(Collectors.toList());
         return scheduleController.createSchedule(createScheduleDTO(petIds, employeeIds, date, activities));
+    }
+
+    private ScheduleDTO createScheduleWithoutSaving(int numEmployees, int numPets, LocalDate date, Set<EmployeeSkill> activities){
+        List<Long> employeeIds = IntStream.range(0, numEmployees)
+                .mapToObj(i -> createEmployeeDTO())
+                .map(e -> {
+                    e.setSkills(activities);
+                    e.setDaysAvailable(Sets.newHashSet(date.getDayOfWeek()));
+                    return userController.saveEmployee(e).getId();
+                }).collect(Collectors.toList());
+        CustomerDTO cust = userController.saveCustomer(createCustomerDTO());
+        List<Long> petIds = IntStream.range(0, numPets)
+                .mapToObj(i -> createPetDTO())
+                .map(p -> {
+                    p.setOwnerId(cust.getId());
+                    return petController.savePet(p).getId();
+                }).collect(Collectors.toList());
+        return createScheduleDTO(petIds, employeeIds, date, activities);
     }
 
     private static void compareSchedules(ScheduleDTO sched1, ScheduleDTO sched2) {

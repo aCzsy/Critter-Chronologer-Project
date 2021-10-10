@@ -45,6 +45,16 @@ public class UserController {
         return convertCustomerToCustomerDTO(savedCustomer);
     }
 
+    @GetMapping("/customer/{customerId}")
+    public CustomerDTO getCustomer(@PathVariable Long customerId){
+        return convertCustomerToCustomerDTO((Customer)userService.findUserById(customerId));
+    }
+
+    @GetMapping("/employee/{employeeId}")
+    public EmployeeDTO getEmployee(@PathVariable Long id){
+        return convertEmployeeToEmployeeDTO((Employee)userService.findUserById(id));
+    }
+
     @GetMapping("/customer")
     public List<CustomerDTO> getAllCustomers(){
         List<CustomerDTO> allCustomers =

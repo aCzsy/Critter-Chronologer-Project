@@ -31,6 +31,10 @@ public class ScheduleService {
         return scheduleRepository.findAll();
     }
 
+    public Schedule getScheduleById(Long id){
+        return scheduleRepository.getOne(id);
+    }
+
     public List<Schedule> findSchedulesByEmployee(Employee employee){
         return scheduleRepository.findSchedulesByEmployee(employee);
     }
