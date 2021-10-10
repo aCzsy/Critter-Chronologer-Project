@@ -3,8 +3,10 @@ package com.udacity.jdnd.course3.critter.service;
 import com.udacity.jdnd.course3.critter.Exception.ScheduleNotFoundException;
 import com.udacity.jdnd.course3.critter.Exception.UserNotFoundException;
 import com.udacity.jdnd.course3.critter.entity.*;
+import com.udacity.jdnd.course3.critter.repository.PetRepository;
 import com.udacity.jdnd.course3.critter.repository.ScheduleRepository;
 import com.udacity.jdnd.course3.critter.repository.UserRepository;
+import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 import org.assertj.core.util.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,9 @@ public class ScheduleService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    PetRepository petRepository;
 
     public Schedule saveSchedule(Schedule schedule){
         return scheduleRepository.save(schedule);
@@ -61,6 +66,40 @@ public class ScheduleService {
 
     public void deleteSchedule(Long id){
         scheduleRepository.deleteById(id);
+    }
+
+    public Schedule addEmployeesToSchedule(Long scheduleId, List<Long> employeeIds){
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        List<Employee> employees =
+            employeeIds
+                .stream()
+                .map(id -> {
+                    Optional<Employee> employee = userRepository.findEmployeeById(id);
+                    //If present,add,otherwise do nothing
+                    employee.ifPresent(value -> schedule.getEmployeeList().add(value));
+                    return employee.get();
+                })
+                .collect(Collectors.toList());
+        return schedule;
+    }
+
+    public Schedule addPetsToSchedule(Long scheduleId, List<Long> petIds){
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        List<Pet> pets =
+                petIds
+                .stream()
+                .map(id -> {
+                    Optional<Pet> pet = petRepository.findById(id);
+                    pet.ifPresent(pet1 -> schedule.getPetList().add(pet1));
+                    return pet.get();
+                }).collect(Collectors.toList());
+        return schedule;
+    }
+
+    public Schedule addActivitiesToSchedule(Long scheduleId, Set<EmployeeSkill> activities){
+        Schedule schedule = scheduleRepository.findById(scheduleId).get();
+        schedule.getActivities().addAll(activities);
+        return schedule;
     }
 
     public Schedule updateSchedule(Schedule schedule){

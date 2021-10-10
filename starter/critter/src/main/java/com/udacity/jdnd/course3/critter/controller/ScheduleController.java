@@ -8,16 +8,14 @@ import com.udacity.jdnd.course3.critter.schedule.ScheduleDTO;
 import com.udacity.jdnd.course3.critter.service.PetService;
 import com.udacity.jdnd.course3.critter.service.ScheduleService;
 import com.udacity.jdnd.course3.critter.service.UserService;
+import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -98,8 +96,23 @@ public class ScheduleController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/update/addEmployees/{scheduleId}")
+    public ScheduleDTO addEmployeesToSchedule(@PathVariable Long scheduleId, @RequestBody List<Long> employeeIds){
+        return convertScheduleToScheduleDTO(scheduleService.addEmployeesToSchedule(scheduleId,employeeIds));
+    }
+
+    @PutMapping("/update/addPets/{scheduleId}")
+    public ScheduleDTO addPetsToSchedule(@PathVariable Long scheduleId, @RequestBody List<Long> petIds){
+        return convertScheduleToScheduleDTO(scheduleService.addPetsToSchedule(scheduleId,petIds));
+    }
+
+    @PutMapping("update/addActivities/{scheduleId}")
+    public ScheduleDTO addActivitiesToSchedule(@PathVariable Long scheduleId, @RequestBody Set<EmployeeSkill> activities){
+        return convertScheduleToScheduleDTO(scheduleService.addActivitiesToSchedule(scheduleId,activities));
+    }
+
     @PutMapping("/update/{scheduleId}")
-    public ScheduleDTO updateSchedule(@PathVariable Long scheduleId, @Valid @RequestBody ScheduleDTO scheduleDTO){
+    public ScheduleDTO updateFullSchedule(@PathVariable Long scheduleId, @Valid @RequestBody ScheduleDTO scheduleDTO){
         scheduleDTO.setId(scheduleId);
         return convertScheduleToScheduleDTO(scheduleService.updateSchedule(convertScheduleDTOtoSchedule(scheduleDTO)));
     }

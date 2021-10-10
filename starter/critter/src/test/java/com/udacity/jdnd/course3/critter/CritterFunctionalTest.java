@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.udacity.jdnd.course3.critter.controller.PetController;
 import com.udacity.jdnd.course3.critter.controller.UserController;
-import com.udacity.jdnd.course3.critter.entity.Pet;
+import com.udacity.jdnd.course3.critter.entity.Employee;
 import com.udacity.jdnd.course3.critter.pet.PetDTO;
 import com.udacity.jdnd.course3.critter.pet.PetType;
 import com.udacity.jdnd.course3.critter.controller.ScheduleController;
@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -346,10 +345,62 @@ public class CritterFunctionalTest {
 
         ScheduleDTO sched2 = createScheduleWithoutSaving(3, 1, LocalDate.of(2019, 12, 26), Sets.newHashSet(EmployeeSkill.PETTING));
 
-        scheduleController.updateSchedule(sched1.getId(), sched2);
+        scheduleController.updateFullSchedule(sched1.getId(), sched2);
         Assertions.assertEquals(3,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
         Assertions.assertEquals(1,scheduleController.getSchedule(sched1.getId()).getPetIds().size());
         Assertions.assertEquals(Sets.newHashSet(EmployeeSkill.PETTING), scheduleController.getSchedule(sched1.getId()).getActivities());
+    }
+
+    @Test
+    public void testAddEmployeesToSchedule(){
+        ScheduleDTO sched1 = populateSchedule(1, 2, LocalDate.of(2019, 12, 25), Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.WALKING));
+        Assertions.assertEquals(sched1.getId(), scheduleController.getSchedule(sched1.getId()).getId());
+        Assertions.assertEquals(1,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
+
+        EmployeeDTO employeeDTO = createEmployeeDTO();
+        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.FRIDAY));
+
+        EmployeeDTO employeeDTO1 = createEmployeeDTO();
+        employeeDTO1.setDaysAvailable(Sets.newHashSet(DayOfWeek.SATURDAY));
+
+        EmployeeDTO savedEmployee = userController.saveEmployee(employeeDTO);
+        EmployeeDTO savedEmployee2 = userController.saveEmployee(employeeDTO1);
+
+        List<Long> employeeIds = Lists.newArrayList(savedEmployee.getId(),savedEmployee2.getId());
+        scheduleController.addEmployeesToSchedule(sched1.getId(),employeeIds);
+
+        Assertions.assertEquals(3,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
+    }
+
+    @Test
+    public void testAddPetsToSchedule(){
+        ScheduleDTO sched1 = populateSchedule(1, 2, LocalDate.of(2019, 12, 25), Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.WALKING));
+        Assertions.assertEquals(sched1.getId(), scheduleController.getSchedule(sched1.getId()).getId());
+        Assertions.assertEquals(2,scheduleController.getSchedule(sched1.getId()).getPetIds().size());
+
+        PetDTO pet = createPetDTO();
+        CustomerDTO customerDTO = createCustomerDTO();
+        CustomerDTO createdCustomer = userController.saveCustomer(customerDTO);
+        pet.setOwnerId(createdCustomer.getId());
+        PetDTO savedPet = petController.savePet(pet);
+
+        List<Long> petIds = Lists.newArrayList(savedPet.getId());
+
+        scheduleController.addPetsToSchedule(sched1.getId(), petIds);
+
+        Assertions.assertEquals(3,scheduleController.getSchedule(sched1.getId()).getPetIds().size());
+    }
+
+    @Test
+    public void testAddActivitiesToSchedule(){
+        ScheduleDTO sched1 = populateSchedule(1, 2, LocalDate.of(2019, 12, 25), Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.WALKING));
+        Assertions.assertEquals(sched1.getId(), scheduleController.getSchedule(sched1.getId()).getId());
+        Assertions.assertEquals(2,scheduleController.getSchedule(sched1.getId()).getActivities().size());
+
+        Set<EmployeeSkill> employeeSkills = Sets.newHashSet(EmployeeSkill.MEDICATING,EmployeeSkill.SHAVING);
+        scheduleController.addActivitiesToSchedule(sched1.getId(),employeeSkills);
+
+        Assertions.assertEquals(4,scheduleController.getSchedule(sched1.getId()).getActivities().size());
     }
 
 
