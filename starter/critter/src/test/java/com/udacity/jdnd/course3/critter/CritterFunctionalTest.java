@@ -295,6 +295,7 @@ public class CritterFunctionalTest {
 
         Assertions.assertEquals(savedPet.getId(), petController.getPet(savedPet.getId()).getId());
 
+        //Creating another pet
         PetDTO pet2 = createPetDTO();
         pet2.setOwnerId(createdCustomer.getId());
         pet2.setType(PetType.BIRD);
@@ -302,7 +303,7 @@ public class CritterFunctionalTest {
         petController.updatePet(savedPet.getId(), pet2);
         //Testing if the type has changed
         Assertions.assertEquals(PetType.BIRD, petController.getPet(savedPet.getId()).getType());
-        //Testing if the name doesn't change if it is not specified in pet2
+        //Testing that the name doesn't change if it is not specified in pet2
         Assertions.assertEquals(savedPet.getName(),petController.getPet(savedPet.getId()).getName());
     }
 
@@ -312,11 +313,12 @@ public class CritterFunctionalTest {
         CustomerDTO savedCustomer = userController.saveCustomer(customerDTO);
         Assertions.assertEquals(savedCustomer.getId(), userController.getCustomer(savedCustomer.getId()).getId());
 
+        //Creating another customer
         CustomerDTO customerDTO1 = createCustomerDTO();
         customerDTO1.setPhoneNumber("123-456-789");
 
         userController.updateCustomer(savedCustomer.getId(), customerDTO1);
-        //Testing if the name doesn't change if it is not specified in customerDT01
+        //Testing that the name doesn't change if it is not specified in customerDT01
         Assertions.assertEquals(savedCustomer.getName(), userController.getCustomer(savedCustomer.getId()).getName());
         //Testing if phone number changed
         Assertions.assertEquals("123-456-789", userController.getCustomer(savedCustomer.getId()).getPhoneNumber());
@@ -329,6 +331,7 @@ public class CritterFunctionalTest {
         EmployeeDTO savedEmployee = userController.saveEmployee(employeeDTO);
         Assertions.assertEquals(savedEmployee.getId(), userController.getEmployee(savedEmployee.getId()).getId());
 
+        //Creating another employee
         EmployeeDTO employeeDTO1 = createEmployeeDTO();
         employeeDTO1.setSkills(Sets.newHashSet(EmployeeSkill.MEDICATING, EmployeeSkill.SHAVING));
         employeeDTO1.setDaysAvailable(Sets.newHashSet(DayOfWeek.TUESDAY, DayOfWeek.FRIDAY));
@@ -343,6 +346,7 @@ public class CritterFunctionalTest {
         ScheduleDTO sched1 = populateSchedule(1, 2, LocalDate.of(2019, 12, 25), Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.WALKING));
         Assertions.assertEquals(sched1.getId(), scheduleController.getSchedule(sched1.getId()).getId());
 
+        //Creating another schedule but not saving it in order to use it as a requestbody
         ScheduleDTO sched2 = createScheduleWithoutSaving(3, 1, LocalDate.of(2019, 12, 26), Sets.newHashSet(EmployeeSkill.PETTING));
 
         scheduleController.updateFullSchedule(sched1.getId(), sched2);
@@ -367,9 +371,19 @@ public class CritterFunctionalTest {
         EmployeeDTO savedEmployee2 = userController.saveEmployee(employeeDTO1);
 
         List<Long> employeeIds = Lists.newArrayList(savedEmployee.getId(),savedEmployee2.getId());
-        scheduleController.addEmployeesToSchedule(sched1.getId(),employeeIds);
 
+        //employees to be added each have atleast one skill that is required for the schedule
+        //so they should be added without a problem and test should pass
+        scheduleController.addEmployeesToSchedule(sched1.getId(),employeeIds);
         Assertions.assertEquals(3,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
+
+        //Creating another employee which doesn't have any skills that are required for a schedule
+        employeeDTO1.setSkills(Sets.newHashSet(EmployeeSkill.MEDICATING, EmployeeSkill.SHAVING));
+        EmployeeDTO savedEmployee3 = userController.saveEmployee(employeeDTO1);
+
+        //Trying to add this employee to our schedule which should result in an exception
+        Assertions.assertThrows(RuntimeException.class, () ->
+                scheduleController.addEmployeesToSchedule(sched1.getId(), Lists.newArrayList(savedEmployee3.getId())));
     }
 
     @Test
@@ -378,6 +392,7 @@ public class CritterFunctionalTest {
         Assertions.assertEquals(sched1.getId(), scheduleController.getSchedule(sched1.getId()).getId());
         Assertions.assertEquals(2,scheduleController.getSchedule(sched1.getId()).getPetIds().size());
 
+        //Creating another pet and its owner
         PetDTO pet = createPetDTO();
         CustomerDTO customerDTO = createCustomerDTO();
         CustomerDTO createdCustomer = userController.saveCustomer(customerDTO);

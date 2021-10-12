@@ -1,6 +1,7 @@
 package com.udacity.jdnd.course3.critter.entity;
 
 import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
@@ -14,6 +15,10 @@ public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+//    if @ManyToMany(cascade = CascadeType.ALL) was defined and the first schedule would be deleted,
+//    Hibernate would throw an exception because another schedule
+//    is still associated with the employees that are being deleted.
+//    Same applies to petList.
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "employee_schedule",

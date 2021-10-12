@@ -18,6 +18,7 @@ public class Customer extends User {
     public Customer() {
     }
 
+    //Adding addPet and removePet methods to make sure both sides of relationship are always in sync.
     public void addPet(Pet pet){
         pets.add(pet);
         pet.setCustomer(this);

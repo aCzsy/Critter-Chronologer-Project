@@ -48,6 +48,8 @@ public class PetController {
         return petDTOToBeReturned;
     }
 
+    //Getting list of all pets
+    //Converting each pet to petDTO and setting corresponding ownerId for each pet
     @GetMapping
     public List<PetDTO> getPets(){
         List<PetDTO> listOfPets =

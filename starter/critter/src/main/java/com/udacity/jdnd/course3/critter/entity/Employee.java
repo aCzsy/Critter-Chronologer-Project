@@ -25,11 +25,6 @@ public class Employee extends User {
     public Employee() {
     }
 
-//    public Employee(Set<EmployeeSkill> skills, Set<DayOfWeek> daysAvailable) {
-//        this.skills = skills;
-//        this.daysAvailable = daysAvailable;
-//    }
-
     public Set<EmployeeSkill> getSkills() {
         return skills;
     }

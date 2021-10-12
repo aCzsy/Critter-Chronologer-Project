@@ -15,10 +15,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Implements the Error controller related to any errors handled by the Vehicles API
- */
-
-/**
 @ControllerAdvice is a specialization of the @Component annotation which allows
 to handle exceptions across the whole application in one global handling component.
 It can be viewed as an interceptor of exceptions thrown by methods annotated with @RequestMapping and similar.
@@ -28,9 +24,6 @@ through @ExceptionHandler methods. It provides an methods for handling internal 
 It returns a ResponseEntity in contrast to DefaultHandlerExceptionResolver which returns a ModelAndView.
  */
 
-/**
- * THIS METHOD VALIDATES FIELDS ANNOTATED WITH @Valid
- */
 @ControllerAdvice
 public class ErrorController{
 

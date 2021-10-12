@@ -9,6 +9,7 @@ import javax.validation.constraints.NotBlank;
 
 @Entity
 @DiscriminatorColumn(name = "user_type")
+//Each entity is mapped to a table and all subclasses also have fields from a parent class.
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class User {
     @Id

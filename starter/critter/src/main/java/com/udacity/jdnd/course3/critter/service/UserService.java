@@ -43,6 +43,9 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    //As there is no validation for fields of Customer entity,
+    //Each field of a Requestbody is checked, if it is null or empty,no change to that field is made,
+    //If its not empty, field gets updated
     public Customer updateCustomer(Customer customer){
         return userRepository.findCustomerById(customer.getId())
                 .map(cust -> {
@@ -56,6 +59,8 @@ public class UserService {
                 }).orElseThrow(UserNotFoundException::new);
     }
 
+    //Optional check only done to name field as its not annotated with any validation options
+    //Other fields must be present as they must pass validation constraints.
     public Employee updateEmployee(Employee employee){
         return userRepository.findEmployeeById(employee.getId())
                 .map(emp -> {
