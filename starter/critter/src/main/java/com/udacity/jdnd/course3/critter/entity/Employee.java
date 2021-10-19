@@ -6,7 +6,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -21,6 +24,10 @@ public class Employee extends User {
     @Column(length = 15)
     //@JoinTable(name = "employee_days_available")
     private Set<DayOfWeek> daysAvailable = new HashSet<>();
+    @ElementCollection
+    @CollectionTable(name = "employee_times_available", joinColumns = @JoinColumn(name = "employee_id"))
+    @Column(length = 10)
+    private List<LocalTime> availableTimes = new ArrayList<>();
 
     public Employee() {
     }
@@ -39,5 +46,13 @@ public class Employee extends User {
 
     public void setDaysAvailable(Set<DayOfWeek> daysAvailable) {
         this.daysAvailable = daysAvailable;
+    }
+
+    public List<LocalTime> getAvailableTimes() {
+        return availableTimes;
+    }
+
+    public void setAvailableTimes(List<LocalTime> availableTimes) {
+        this.availableTimes = availableTimes;
     }
 }

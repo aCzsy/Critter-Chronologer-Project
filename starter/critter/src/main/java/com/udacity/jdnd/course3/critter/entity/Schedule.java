@@ -7,6 +7,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +36,8 @@ public class Schedule {
     )
     private List<Pet> petList = new ArrayList<>();
     private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
     @ElementCollection
     @JoinTable(name = "employee_activities")
     private List<EmployeeSkill> activities = new ArrayList<>();
@@ -71,6 +75,22 @@ public class Schedule {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 
     public List<EmployeeSkill> getActivities() {

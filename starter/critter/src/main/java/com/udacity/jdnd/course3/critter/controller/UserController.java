@@ -51,8 +51,8 @@ public class UserController {
     }
 
     @GetMapping("/employee/{employeeId}")
-    public EmployeeDTO getEmployee(@PathVariable Long id){
-        return convertEmployeeToEmployeeDTO((Employee)userService.findUserById(id));
+    public EmployeeDTO getEmployee(@PathVariable Long employeeId){
+        return convertEmployeeToEmployeeDTO((Employee)userService.findUserById(employeeId));
     }
 
     @GetMapping("/customer")

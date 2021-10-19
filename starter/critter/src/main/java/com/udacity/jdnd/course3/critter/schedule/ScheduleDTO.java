@@ -5,6 +5,8 @@ import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +24,10 @@ public class ScheduleDTO {
     @NotNull(message = "List of pets is required")
     @NotEmpty(message = "List of pets should not be empty")
     private List<Long> petIds = new ArrayList<>();
+    @NotNull
     private LocalDate date;
+    private LocalTime startTime;
+    private LocalTime endTime;
     @NotNull(message = "List of activities is required")
     @NotEmpty(message = "List of activities should not be empty")
     private Set<EmployeeSkill> activities = new HashSet<>();
@@ -57,6 +62,22 @@ public class ScheduleDTO {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public LocalTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 
     public Set<EmployeeSkill> getActivities() {

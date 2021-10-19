@@ -10,6 +10,7 @@ import com.udacity.jdnd.course3.critter.pet.PetType;
 import com.udacity.jdnd.course3.critter.controller.ScheduleController;
 import com.udacity.jdnd.course3.critter.schedule.ScheduleDTO;
 import com.udacity.jdnd.course3.critter.user.*;
+import org.apache.tomcat.jni.Local;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -182,6 +185,8 @@ public class CritterFunctionalTest {
         PetDTO petDTO = petController.savePet(petTemp);
 
         LocalDate date = LocalDate.of(2019, 12, 25);
+//        LocalDateTime startTime = LocalDateTime.of(2019, 12, 25,9,30);
+//        LocalDateTime endTime = LocalDateTime.of(2019,12,25,11,30);
         List<Long> petList = Lists.newArrayList(petDTO.getId());
         List<Long> employeeList = Lists.newArrayList(employeeDTO.getId());
         Set<EmployeeSkill> skillSet =  Sets.newHashSet(EmployeeSkill.PETTING);
@@ -190,7 +195,8 @@ public class CritterFunctionalTest {
         ScheduleDTO scheduleDTO = scheduleController.getAllSchedules().get(0);
 
         Assertions.assertEquals(scheduleDTO.getActivities(), skillSet);
-        Assertions.assertEquals(scheduleDTO.getDate(), date);
+//        Assertions.assertEquals(scheduleDTO.getStartTime(), startTime);
+//        Assertions.assertEquals(scheduleDTO.getEndTime(),endTime);
         Assertions.assertEquals(scheduleDTO.getEmployeeIds(), employeeList);
         Assertions.assertEquals(scheduleDTO.getPetIds(), petList);
     }
@@ -202,10 +208,15 @@ public class CritterFunctionalTest {
 
         //add a third schedule that shares some employees and pets with the other schedules
         ScheduleDTO sched3 = new ScheduleDTO();
-        sched3.setEmployeeIds(sched1.getEmployeeIds());
+        //sched3.setEmployeeIds(sched1.getEmployeeIds());
         sched3.setPetIds(sched2.getPetIds());
         sched3.setActivities(Sets.newHashSet(EmployeeSkill.SHAVING, EmployeeSkill.PETTING));
         sched3.setDate(LocalDate.of(2020, 3, 23));
+        //Adjusting employee stats to avoid constraints conflicts when creating schedule
+        EmployeeDTO employee = userController.getEmployee(sched1.getEmployeeIds().get(0));
+        employee.getDaysAvailable().add(sched3.getDate().getDayOfWeek());
+        employee.getSkills().add(EmployeeSkill.PETTING);
+        sched3.setEmployeeIds(Lists.newArrayList(userController.updateEmployee(employee.getId(), employee).getId()));
         scheduleController.createSchedule(sched3);
 
         /*
@@ -362,17 +373,17 @@ public class CritterFunctionalTest {
         Assertions.assertEquals(1,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
 
         EmployeeDTO employeeDTO = createEmployeeDTO();
-        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.FRIDAY));
+        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.WEDNESDAY));
 
         EmployeeDTO employeeDTO1 = createEmployeeDTO();
-        employeeDTO1.setDaysAvailable(Sets.newHashSet(DayOfWeek.SATURDAY));
+        employeeDTO1.setDaysAvailable(Sets.newHashSet(DayOfWeek.WEDNESDAY));
 
         EmployeeDTO savedEmployee = userController.saveEmployee(employeeDTO);
         EmployeeDTO savedEmployee2 = userController.saveEmployee(employeeDTO1);
 
         List<Long> employeeIds = Lists.newArrayList(savedEmployee.getId(),savedEmployee2.getId());
 
-        //employees to be added each have atleast one skill that is required for the schedule
+        //employees to be added each have at least one skill that is required for the schedule
         //so they should be added without a problem and test should pass
         scheduleController.addEmployeesToSchedule(sched1.getId(),employeeIds);
         Assertions.assertEquals(3,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
@@ -384,6 +395,65 @@ public class CritterFunctionalTest {
         //Trying to add this employee to our schedule which should result in an exception
         Assertions.assertThrows(RuntimeException.class, () ->
                 scheduleController.addEmployeesToSchedule(sched1.getId(), Lists.newArrayList(savedEmployee3.getId())));
+    }
+
+    @Test void addEmployeesToScheduleAndCheckDays(){
+        ScheduleDTO sched1 = populateSchedule(1, 2, LocalDate.of(2019, 12, 25), Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.WALKING));
+
+        EmployeeDTO employeeDTO = createEmployeeDTO();
+        //Setting employee's available day which matches the schedule
+        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.WEDNESDAY));
+        EmployeeDTO savedEmployee = userController.saveEmployee(employeeDTO);
+        List<Long> employeeIds = Lists.newArrayList(savedEmployee.getId());
+        //Adding employee with available day that matches the schedule so should be added without a problem
+        scheduleController.addEmployeesToSchedule(sched1.getId(), employeeIds);
+        Assertions.assertEquals(2,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
+
+
+        EmployeeDTO employeeDTO1 = createEmployeeDTO();
+        employeeDTO1.setDaysAvailable(Sets.newHashSet(DayOfWeek.FRIDAY));
+        EmployeeDTO savedEmployee2 = userController.saveEmployee(employeeDTO1);
+        List<Long> employeeIds2 = Lists.newArrayList(savedEmployee.getId(),savedEmployee2.getId());
+        //Adding employee with available day that don't match the schedule so should fail adding
+        Assertions.assertThrows(RuntimeException.class,() ->
+                scheduleController.addEmployeesToSchedule(sched1.getId(), employeeIds2));
+        Assertions.assertEquals(2,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
+    }
+
+    @Test
+    public void addEmployeesToScheduleAndCheckDaysAndTime(){
+        ScheduleDTO sched1 = populateSchedule(1, 2, LocalDate.of(2019, 12, 25), Sets.newHashSet(EmployeeSkill.FEEDING, EmployeeSkill.WALKING));
+        //Now setting start and end time on a schedule
+        sched1.setStartTime(LocalTime.of(9,30));
+        sched1.setEndTime(LocalTime.of(12,30));
+        //updating sched1 with recent changes
+        scheduleController.updateFullSchedule(sched1.getId(), sched1);
+
+        EmployeeDTO employeeDTO = createEmployeeDTO();
+        //Setting day available that match the schedule
+        employeeDTO.setDaysAvailable(Sets.newHashSet(DayOfWeek.WEDNESDAY));
+        //Setting the time available that matches the schedule
+        employeeDTO.setAvailableTimes(Lists.newArrayList(LocalTime.of(9,35)));
+        EmployeeDTO savedEmployee = userController.saveEmployee(employeeDTO);
+
+        List<Long> employeeIds = Lists.newArrayList(savedEmployee.getId());
+        scheduleController.addEmployeesToSchedule(sched1.getId(), employeeIds);
+
+        //Employee should've been added so test should pass
+        Assertions.assertEquals(2,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
+
+        EmployeeDTO employeeDTO1 = createEmployeeDTO();
+        //Setting day available that match the schedule
+        employeeDTO1.setDaysAvailable(Sets.newHashSet(DayOfWeek.WEDNESDAY));
+        //Setting the time available that doesn't match the schedule
+        employeeDTO1.setAvailableTimes(Lists.newArrayList(LocalTime.of(8,35)));
+        EmployeeDTO savedEmployee2 = userController.saveEmployee(employeeDTO1);
+        List<Long> employeeIds2 = Lists.newArrayList(savedEmployee2.getId());
+        //Employee's time available doesn't match the schedule so addition should fail
+        Assertions.assertThrows(RuntimeException.class, () ->
+                scheduleController.addEmployeesToSchedule(sched1.getId(), employeeIds2));
+        Assertions.assertEquals(2,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
+
     }
 
     @Test
@@ -446,7 +516,7 @@ public class CritterFunctionalTest {
         return employeeRequestDTO;
     }
 
-    private static ScheduleDTO createScheduleDTO(List<Long> petIds, List<Long> employeeIds, LocalDate date, Set<EmployeeSkill> activities) {
+    private static ScheduleDTO createScheduleDTO(List<Long> petIds, List<Long> employeeIds,LocalDate date,Set<EmployeeSkill> activities) {
         ScheduleDTO scheduleDTO = new ScheduleDTO();
         scheduleDTO.setPetIds(petIds);
         scheduleDTO.setEmployeeIds(employeeIds);
@@ -455,7 +525,7 @@ public class CritterFunctionalTest {
         return scheduleDTO;
     }
 
-    private ScheduleDTO populateSchedule(int numEmployees, int numPets, LocalDate date, Set<EmployeeSkill> activities) {
+    private ScheduleDTO populateSchedule(int numEmployees, int numPets,LocalDate date,Set<EmployeeSkill> activities) {
         List<Long> employeeIds = IntStream.range(0, numEmployees)
                 .mapToObj(i -> createEmployeeDTO())
                 .map(e -> {
@@ -470,10 +540,10 @@ public class CritterFunctionalTest {
                     p.setOwnerId(cust.getId());
                     return petController.savePet(p).getId();
                 }).collect(Collectors.toList());
-        return scheduleController.createSchedule(createScheduleDTO(petIds, employeeIds, date, activities));
+        return scheduleController.createSchedule(createScheduleDTO(petIds, employeeIds,date, activities));
     }
 
-    private ScheduleDTO createScheduleWithoutSaving(int numEmployees, int numPets, LocalDate date, Set<EmployeeSkill> activities){
+    private ScheduleDTO createScheduleWithoutSaving(int numEmployees, int numPets,LocalDate date, Set<EmployeeSkill> activities){
         List<Long> employeeIds = IntStream.range(0, numEmployees)
                 .mapToObj(i -> createEmployeeDTO())
                 .map(e -> {
@@ -488,14 +558,16 @@ public class CritterFunctionalTest {
                     p.setOwnerId(cust.getId());
                     return petController.savePet(p).getId();
                 }).collect(Collectors.toList());
-        return createScheduleDTO(petIds, employeeIds, date, activities);
+        return createScheduleDTO(petIds, employeeIds,date,activities);
     }
 
     private static void compareSchedules(ScheduleDTO sched1, ScheduleDTO sched2) {
         Assertions.assertEquals(sched1.getPetIds(), sched2.getPetIds());
         Assertions.assertEquals(sched1.getActivities(), sched2.getActivities());
         Assertions.assertEquals(sched1.getEmployeeIds(), sched2.getEmployeeIds());
-        Assertions.assertEquals(sched1.getDate(), sched2.getDate());
+        Assertions.assertEquals(sched1.getDate(),sched2.getDate());
+        Assertions.assertEquals(sched1.getStartTime(), sched2.getStartTime());
+        Assertions.assertEquals(sched1.getEndTime(),sched1.getEndTime());
     }
 
 }
