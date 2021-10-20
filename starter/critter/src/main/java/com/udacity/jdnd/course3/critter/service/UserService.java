@@ -50,12 +50,9 @@ public class UserService {
     public Customer updateCustomer(Customer customer){
         return userRepository.findCustomerById(customer.getId())
                 .map(cust -> {
-                    Optional<String> phoneNumber = Optional.ofNullable(customer.getPhoneNumber());
-                    if(phoneNumber.isPresent()) cust.setPhoneNumber(phoneNumber.get()); else cust.setPhoneNumber(cust.getPhoneNumber());
-                    Optional<String> name = Optional.ofNullable(customer.getName());
-                    if(name.isPresent()) cust.setName(name.get()); else cust.setName(cust.getName());
-                    Optional<String> notes = Optional.ofNullable(customer.getNotes());
-                    if(notes.isPresent()) cust.setNotes(notes.get()); else cust.setNotes(cust.getNotes());
+                    cust.setPhoneNumber(Optional.ofNullable(customer.getPhoneNumber()).orElse(cust.getPhoneNumber()));
+                    cust.setName(Optional.ofNullable(customer.getName()).orElse(cust.getName()));
+                    cust.setNotes(Optional.ofNullable(customer.getNotes()).orElse(cust.getNotes()));
                     return cust;
                 }).orElseThrow(UserNotFoundException::new);
     }
@@ -65,12 +62,10 @@ public class UserService {
     public Employee updateEmployee(Employee employee){
         return userRepository.findEmployeeById(employee.getId())
                 .map(emp -> {
-                    Optional<String> name = Optional.ofNullable(employee.getName());
-                    if(name.isPresent()) emp.setName(name.get()); else emp.setName(emp.getName());
+                    emp.setName(Optional.ofNullable(employee.getName()).orElse(emp.getName()));
                     emp.setSkills(employee.getSkills());
                     emp.setDaysAvailable(employee.getDaysAvailable());
-                    Optional<List<LocalTime>> timesAvailable = Optional.ofNullable(employee.getAvailableTimes());
-                    if(timesAvailable.isPresent()) emp.setAvailableTimes(timesAvailable.get()); else emp.setAvailableTimes(emp.getAvailableTimes());
+                    emp.setAvailableTimes(Optional.ofNullable(employee.getAvailableTimes()).orElse(emp.getAvailableTimes()));
                     return emp;
                 }).orElseThrow(UserNotFoundException::new);
     }

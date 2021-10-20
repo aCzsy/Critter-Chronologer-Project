@@ -91,7 +91,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Hannah\",\r\n  \"skills\": [\"PETTING\", \"FEEDING\"]\r\n}",
+					"raw": "{\r\n  \"name\": \"Joanna\",\r\n  \"skills\": [\"PETTING\", \"FEEDING\", \"WALKING\",\"MEDICATING\"],\r\n  \"daysAvailable\":[\"MONDAY\",\"WEDNESDAY\",\"THURSDAY\"],\r\n  \"availableTimes\":[\"09:45\",\"10:55\"]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -864,6 +864,26 @@
 						"update",
 						"addActivities",
 						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8082/user/getAllUsers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"user",
+						"getAllUsers"
 					]
 				}
 			},

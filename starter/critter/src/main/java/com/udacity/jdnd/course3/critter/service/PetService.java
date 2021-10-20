@@ -55,8 +55,7 @@ public class PetService {
                     pet.setName(newPet.getName());
                     pet.setBirthDate(newPet.getBirthDate());
                     pet.setType(newPet.getType());
-                    Optional<String> notes = Optional.ofNullable(newPet.getNotes());
-                    if(notes.isPresent()) pet.setNotes(newPet.getNotes()); else pet.setNotes(pet.getNotes());
+                    pet.setNotes(Optional.ofNullable(newPet.getNotes()).orElse(pet.getNotes()));
                     return petRepository.save(pet);
                 }).orElseThrow(PetNotFoundException::new);
     }

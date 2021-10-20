@@ -185,8 +185,6 @@ public class CritterFunctionalTest {
         PetDTO petDTO = petController.savePet(petTemp);
 
         LocalDate date = LocalDate.of(2019, 12, 25);
-//        LocalDateTime startTime = LocalDateTime.of(2019, 12, 25,9,30);
-//        LocalDateTime endTime = LocalDateTime.of(2019,12,25,11,30);
         List<Long> petList = Lists.newArrayList(petDTO.getId());
         List<Long> employeeList = Lists.newArrayList(employeeDTO.getId());
         Set<EmployeeSkill> skillSet =  Sets.newHashSet(EmployeeSkill.PETTING);
@@ -195,8 +193,6 @@ public class CritterFunctionalTest {
         ScheduleDTO scheduleDTO = scheduleController.getAllSchedules().get(0);
 
         Assertions.assertEquals(scheduleDTO.getActivities(), skillSet);
-//        Assertions.assertEquals(scheduleDTO.getStartTime(), startTime);
-//        Assertions.assertEquals(scheduleDTO.getEndTime(),endTime);
         Assertions.assertEquals(scheduleDTO.getEmployeeIds(), employeeList);
         Assertions.assertEquals(scheduleDTO.getPetIds(), petList);
     }
@@ -364,6 +360,12 @@ public class CritterFunctionalTest {
         Assertions.assertEquals(3,scheduleController.getSchedule(sched1.getId()).getEmployeeIds().size());
         Assertions.assertEquals(1,scheduleController.getSchedule(sched1.getId()).getPetIds().size());
         Assertions.assertEquals(Sets.newHashSet(EmployeeSkill.PETTING), scheduleController.getSchedule(sched1.getId()).getActivities());
+
+        //Mixing up employees to check if constraints work
+        ScheduleDTO sched3 = createScheduleWithoutSaving(2,1,LocalDate.of(2019,12,12),Sets.newHashSet(EmployeeSkill.SHAVING));
+        sched3.setEmployeeIds(sched1.getEmployeeIds());
+        Assertions.assertThrows(RuntimeException.class,() ->
+                scheduleController.updateFullSchedule(sched1.getId(),sched3));
     }
 
     @Test

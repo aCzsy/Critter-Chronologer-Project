@@ -176,10 +176,8 @@ public class ScheduleService {
                     sched.setActivities(schedule.getActivities());
                     sched.setPetList(schedule.getPetList());
                     sched.setDate(schedule.getDate());
-                    Optional<LocalTime> startTime = Optional.ofNullable(schedule.getStartTime());
-                    Optional<LocalTime> endTime = Optional.ofNullable(schedule.getEndTime());
-                    if(startTime.isPresent()) sched.setStartTime(startTime.get()); else sched.setStartTime(sched.getStartTime());
-                    if(endTime.isPresent()) sched.setEndTime(endTime.get()); else sched.setEndTime(schedule.getEndTime());
+                    sched.setStartTime(Optional.ofNullable(schedule.getStartTime()).orElse(sched.getStartTime()));
+                    sched.setEndTime(Optional.ofNullable(schedule.getEndTime()).orElse(sched.getEndTime()));
                     return this.saveSchedule(sched);
                 }).orElseThrow(ScheduleNotFoundException::new);
     }
