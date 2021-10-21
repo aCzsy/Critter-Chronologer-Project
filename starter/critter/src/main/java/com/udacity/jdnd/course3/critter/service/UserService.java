@@ -1,17 +1,23 @@
 package com.udacity.jdnd.course3.critter.service;
 
 import com.udacity.jdnd.course3.critter.Exception.UserNotFoundException;
+import com.udacity.jdnd.course3.critter.controller.UserController;
 import com.udacity.jdnd.course3.critter.entity.Customer;
 import com.udacity.jdnd.course3.critter.entity.Employee;
 import com.udacity.jdnd.course3.critter.entity.User;
 import com.udacity.jdnd.course3.critter.repository.UserRepository;
+import com.udacity.jdnd.course3.critter.user.EmployeeDTO;
+import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,6 +36,16 @@ public class UserService {
         } else{
             throw new UserNotFoundException("User not found");
         }
+    }
+
+    public List<Employee> findEmployeesForSchedule(Set<EmployeeSkill> skills, LocalDate date){
+        List<Employee> employeeList =
+            userRepository.findAllEmployees()
+            .stream()
+            .filter(employee -> employee.getSkills().containsAll(skills)
+            && employee.getDaysAvailable().contains(date.getDayOfWeek()))
+            .collect(Collectors.toList());
+        return employeeList;
     }
 
     public List<Employee> findAllEmployees() {return userRepository.findAllEmployees();}

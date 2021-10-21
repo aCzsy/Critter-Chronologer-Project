@@ -21,7 +21,7 @@ public abstract class User {
     String name;
     @JsonView(Views.Public.class)
     @Transient
-    String type = this.getClass().getSimpleName();
+    private final String type = this.getClass().getSimpleName();
 
     public User() {
     }
@@ -40,9 +40,5 @@ public abstract class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType(){
-        return type;
     }
 }

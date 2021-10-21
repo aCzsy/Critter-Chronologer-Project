@@ -121,15 +121,12 @@ public class UserController {
     @GetMapping("/employee/availability")
     public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
         List<EmployeeDTO> employeeList =
-                userService.findAllEmployees()
+            userService.findEmployeesForSchedule(employeeDTO.getSkills(),employeeDTO.getDate())
                 .stream()
-                .filter(employee -> employee.getSkills().containsAll(employeeDTO.getSkills())
-                && employee.getDaysAvailable().contains(employeeDTO.getDate().getDayOfWeek()))
                 .map(UserController::convertEmployeeToEmployeeDTO)
                 .collect(Collectors.toList());
         return employeeList;
     }
-
 
     @DeleteMapping("/employee/delete/{employeeId}")
     public ResponseEntity<?> deleteEmployee(@PathVariable Long employeeId){
