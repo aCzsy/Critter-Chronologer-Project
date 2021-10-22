@@ -28,4 +28,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select e from Employee e where :dayOfWeek member of e.daysAvailable and :skills" +
             " member of e.skills")
     List<Employee> findEmployeesForSchedule(Set<EmployeeSkill> skills, DayOfWeek dayOfWeek);
+
 }

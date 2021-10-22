@@ -38,14 +38,16 @@ import java.util.stream.IntStream;
 @SpringBootTest(classes = CritterApplication.class)
 public class CritterFunctionalTest {
 
-    @Autowired
-    private UserController userController;
+    private final UserController userController;
+    private final PetController petController;
+    private final ScheduleController scheduleController;
 
     @Autowired
-    private PetController petController;
-
-    @Autowired
-    private ScheduleController scheduleController;
+    public CritterFunctionalTest(UserController userController, PetController petController, ScheduleController scheduleController) {
+        this.userController = userController;
+        this.petController = petController;
+        this.scheduleController = scheduleController;
+    }
 
     @Test
     public void testCreateCustomer(){

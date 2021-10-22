@@ -1,29 +1,30 @@
 package com.udacity.jdnd.course3.critter.service;
 
 import com.udacity.jdnd.course3.critter.Exception.UserNotFoundException;
-import com.udacity.jdnd.course3.critter.controller.UserController;
 import com.udacity.jdnd.course3.critter.entity.Customer;
 import com.udacity.jdnd.course3.critter.entity.Employee;
 import com.udacity.jdnd.course3.critter.entity.User;
 import com.udacity.jdnd.course3.critter.repository.UserRepository;
-import com.udacity.jdnd.course3.critter.user.EmployeeDTO;
 import com.udacity.jdnd.course3.critter.user.EmployeeSkill;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class UserService {
+
+    private final UserRepository userRepository;
+
     @Autowired
-    UserRepository userRepository;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     public User saveUser(User user){
         return userRepository.save(user);
@@ -38,6 +39,24 @@ public class UserService {
         }
     }
 
+    public Employee findEmployeeById(Long id){
+        Optional<Employee> foundEmployee = userRepository.findEmployeeById(id);
+        if(foundEmployee.isPresent()){
+            return foundEmployee.get();
+        } else {
+            throw new RuntimeException("Employee not found");
+        }
+    }
+
+    public Customer findCustomerById(Long id){
+        Optional<Customer> foundCustomer = userRepository.findCustomerById(id);
+        if(foundCustomer.isPresent()){
+            return foundCustomer.get();
+        } else{
+            throw new RuntimeException("Customer not found");
+        }
+    }
+
     public List<Employee> findEmployeesForSchedule(Set<EmployeeSkill> skills, LocalDate date){
         List<Employee> employeeList =
             userRepository.findAllEmployees()
@@ -47,6 +66,7 @@ public class UserService {
             .collect(Collectors.toList());
         return employeeList;
     }
+
 
     public List<Employee> findAllEmployees() {return userRepository.findAllEmployees();}
 

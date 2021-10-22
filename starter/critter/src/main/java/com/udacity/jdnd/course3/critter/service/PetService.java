@@ -17,11 +17,14 @@ import java.util.Optional;
 @Transactional
 public class PetService {
 
-    @Autowired
-    PetRepository petRepository;
+    private final PetRepository petRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    UserRepository userRepository;
+    public PetService(PetRepository petRepository, UserRepository userRepository) {
+        this.petRepository = petRepository;
+        this.userRepository = userRepository;
+    }
 
     public Pet savePet(Pet pet){
         return petRepository.save(pet);

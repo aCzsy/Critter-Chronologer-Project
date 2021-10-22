@@ -32,11 +32,14 @@ import java.util.stream.Collectors;
 @RequestMapping("/user")
 public class UserController {
 
-    @Autowired
-    UserService userService;
+    private final UserService userService;
+    private final PetService petService;
 
     @Autowired
-    PetService petService;
+    UserController(UserService userService, PetService petService) {
+        this.userService = userService;
+        this.petService = petService;
+    }
 
     @PostMapping("/customer")
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
@@ -47,12 +50,12 @@ public class UserController {
 
     @GetMapping("/customer/{customerId}")
     public CustomerDTO getCustomer(@PathVariable Long customerId){
-        return convertCustomerToCustomerDTO((Customer)userService.findUserById(customerId));
+        return convertCustomerToCustomerDTO((Customer)userService.findCustomerById(customerId));
     }
 
     @GetMapping("/employee/{employeeId}")
     public EmployeeDTO getEmployee(@PathVariable Long employeeId){
-        return convertEmployeeToEmployeeDTO((Employee)userService.findUserById(employeeId));
+        return convertEmployeeToEmployeeDTO((Employee)userService.findEmployeeById(employeeId));
     }
 
     @GetMapping("/customer")
@@ -119,13 +122,11 @@ public class UserController {
     }
 
     @GetMapping("/employee/availability")
-    public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeDTO) {
-        List<EmployeeDTO> employeeList =
-            userService.findEmployeesForSchedule(employeeDTO.getSkills(),employeeDTO.getDate())
+    public List<EmployeeDTO> findEmployeesForService(@RequestBody EmployeeRequestDTO employeeRequestDTO){
+        return userService.findEmployeesForSchedule(employeeRequestDTO.getSkills(),employeeRequestDTO.getDate())
                 .stream()
                 .map(UserController::convertEmployeeToEmployeeDTO)
                 .collect(Collectors.toList());
-        return employeeList;
     }
 
     @DeleteMapping("/employee/delete/{employeeId}")

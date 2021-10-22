@@ -19,11 +19,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/pet")
 public class PetController {
-    @Autowired
-    PetService petService;
+
+    private final PetService petService;
+    private final UserService userService;
 
     @Autowired
-    UserService userService;
+    public PetController(PetService petService, UserService userService) {
+        this.petService = petService;
+        this.userService = userService;
+    }
 
     @PostMapping
     public PetDTO savePet(@RequestBody PetDTO petDTO) {

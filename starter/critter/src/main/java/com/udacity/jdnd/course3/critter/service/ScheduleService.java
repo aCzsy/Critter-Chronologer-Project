@@ -23,14 +23,17 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class ScheduleService {
-    @Autowired
-    ScheduleRepository scheduleRepository;
+
+    private final ScheduleRepository scheduleRepository;
+    private final UserRepository userRepository;
+    private final PetRepository petRepository;
 
     @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    PetRepository petRepository;
+    public ScheduleService(ScheduleRepository scheduleRepository, UserRepository userRepository, PetRepository petRepository) {
+        this.scheduleRepository = scheduleRepository;
+        this.userRepository = userRepository;
+        this.petRepository = petRepository;
+    }
 
     /**
      * This method only saves a schedule that passes all the constraint checks
